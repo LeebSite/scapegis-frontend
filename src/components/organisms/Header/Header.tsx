@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Typography } from '../../atoms';
 import { NavigationItem } from '../../molecules';
 import { HeaderProps } from '../../../types';
@@ -9,6 +10,7 @@ const Header: React.FC<HeaderProps> = ({
   logo,
   className,
 }) => {
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -41,10 +43,10 @@ const Header: React.FC<HeaderProps> = ({
 
           {/* CTA Button */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => navigate('/dashboard')}>
               Sign In
             </Button>
-            <Button variant="primary" size="sm">
+            <Button variant="primary" size="sm" onClick={() => navigate('/dashboard')}>
               Get Started
             </Button>
           </div>
@@ -95,10 +97,10 @@ const Header: React.FC<HeaderProps> = ({
                 />
               ))}
               <div className="pt-4 space-y-2">
-                <Button variant="outline" size="sm" className="w-full">
+                <Button variant="outline" size="sm" className="w-full" onClick={() => navigate('/dashboard')}>
                   Sign In
                 </Button>
-                <Button variant="primary" size="sm" className="w-full">
+                <Button variant="primary" size="sm" className="w-full" onClick={() => navigate('/dashboard')}>
                   Get Started
                 </Button>
               </div>

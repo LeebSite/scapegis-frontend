@@ -1,8 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { LandingPageTemplate } from '../../components/templates';
 import { NavigationItem, FeatureCardProps } from '../../types';
 
 const LandingPage: React.FC = () => {
+  const navigate = useNavigate();
+
   const navigationItems: NavigationItem[] = [
     { label: 'Home', href: '#home', active: true },
     { label: 'Features', href: '#features' },
@@ -18,7 +21,7 @@ const LandingPage: React.FC = () => {
     description: 'AI-powered geo analytics platform for software developer, logistic services, consultant, investor, and government',
     primaryAction: {
       label: 'Get Started Free',
-      onClick: () => console.log('Get Started clicked'),
+      onClick: () => navigate('/dashboard'),
     },
     secondaryAction: {
       label: 'Watch Demo',
