@@ -1,8 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DashboardTemplate } from '../../components/templates';
 import { ProjectsOverview } from '../../components/organisms';
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
   const user = {
     name: 'Muhammad Ghalib Pradipa',
     email: 'ghalib@scapegis.com',
@@ -12,12 +14,14 @@ const Dashboard: React.FC = () => {
 
   const handleProjectClick = (project: any) => {
     console.log('Opening project:', project);
-    // Navigate to project detail/editor
+    // Navigate to existing project editor
+    navigate(`/project/${project.id}`);
   };
 
   const handleNewProject = () => {
     console.log('Creating new project');
-    // Navigate to project creation
+    // Navigate to new project editor
+    navigate('/project/new');
   };
 
   return (
