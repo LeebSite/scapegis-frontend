@@ -3,16 +3,16 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 // Fix for default markers in Leaflet with Webpack
-delete L.Icon.Default.prototype._getIconUrl;
+delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-const MapContainer = () => {
-  const mapRef = useRef(null);
-  const mapInstanceRef = useRef(null);
+const MapContainer: React.FC = () => {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
 
   useEffect(() => {
     if (mapRef.current && !mapInstanceRef.current) {
@@ -44,7 +44,7 @@ const MapContainer = () => {
 
       // Add some sample data (world countries outline)
       // This would typically come from your GIS data
-      const worldBounds = [
+      const worldBounds: L.LatLngBoundsExpression = [
         [-90, -180],
         [90, 180]
       ];
@@ -69,7 +69,7 @@ const MapContainer = () => {
       cities.forEach(city => {
         L.marker([city.lat, city.lng])
           .bindPopup(`<b>${city.name}</b><br>Lat: ${city.lat}<br>Lng: ${city.lng}`)
-          .addTo(mapInstanceRef.current);
+          .addTo(mapInstanceRef.current!);
       });
     }
 

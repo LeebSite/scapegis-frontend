@@ -1,8 +1,12 @@
 import React from 'react';
-import { ArrowLeft, Share2, MoreVertical, Calendar, Users } from 'lucide-react';
+import { ArrowLeft, Calendar, Users, MoreVertical } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const MapHeader = ({ projectName = "Untitled Project" }) => {
+interface MapHeaderProps {
+  projectName?: string;
+}
+
+const MapHeader: React.FC<MapHeaderProps> = ({ projectName = "Untitled Project" }) => {
   const navigate = useNavigate();
 
   return (

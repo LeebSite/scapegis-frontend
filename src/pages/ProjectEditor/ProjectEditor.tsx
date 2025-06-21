@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useProjectStore } from '../stores/projectStore';
-import MapHeader from '../components/atoms/MapHeader';
-import MapToolbar from '../components/atoms/MapToolbar';
-import LayerPanel from '../components/molecules/LayerPanel';
-import MapContainer from '../components/organisms/MapContainer';
-import MapControls from '../components/organisms/MapControls';
+import { useProjectStore } from '../../stores/projectStore';
+import { MapHeader, MapToolbar } from '../../components/atoms';
+import { LayerPanel } from '../../components/molecules';
+import { MapContainer, MapControls } from '../../components/organisms';
 
-const ProjectEditor = () => {
-  const { projectId } = useParams();
+const ProjectEditor: React.FC = () => {
+  const { projectId } = useParams<{ projectId: string }>();
   const [isLayerPanelOpen, setIsLayerPanelOpen] = useState(true);
-
-  const {
-    currentProject,
-    isLoading,
-    createNewProject,
+  
+  const { 
+    currentProject, 
+    isLoading, 
+    createNewProject, 
     loadProject
   } = useProjectStore();
 
@@ -23,7 +21,7 @@ const ProjectEditor = () => {
       // Create new project
       const newProject = createNewProject('Untitled Project');
       console.log('Created new project:', newProject);
-    } else {
+    } else if (projectId) {
       // Load existing project
       loadProject(projectId);
     }

@@ -7,7 +7,7 @@ import {
   Layers
 } from 'lucide-react';
 
-const MapControls = () => {
+const MapControls: React.FC = () => {
   return (
     <>
       {/* Bottom Controls */}

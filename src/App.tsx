@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { LandingPage, Dashboard } from './pages';
-import ProjectEditor from './pages/ProjectEditor';
+import { LandingPage, Dashboard, ProjectEditor } from './pages';
 import './App.css';
 
 function App() {

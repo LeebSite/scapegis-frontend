@@ -5,13 +5,10 @@ import {
   Camera, 
   ZoomIn, 
   ZoomOut, 
-  RotateCcw,
-  Settings,
-  Share2,
-  Download
+  RotateCcw
 } from 'lucide-react';
 
-const MapToolbar = () => {
+const MapToolbar: React.FC = () => {
   return (
     <div className="absolute top-4 left-4 z-[1000] flex flex-col gap-2">
       {/* Search Tool */}

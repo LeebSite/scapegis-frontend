@@ -4,3 +4,5 @@ export { default as FeaturesSection } from './FeaturesSection';
 export { default as DashboardSidebar } from './DashboardSidebar';
 export { default as DashboardHeader } from './DashboardHeader';
 export { default as ProjectsOverview } from './ProjectsOverview';
+export { default as MapContainer } from './MapContainer';
+export { default as MapControls } from './MapControls';

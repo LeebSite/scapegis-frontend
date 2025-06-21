@@ -9,7 +9,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 
-const LayerPanel = () => {
+const LayerPanel: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [layers, setLayers] = useState([
     { id: 1, name: 'Base Map', visible: true, type: 'base' },
@@ -17,7 +17,7 @@ const LayerPanel = () => {
     { id: 3, name: 'Cities', visible: false, type: 'point' }
   ]);
 
-  const toggleLayerVisibility = (layerId) => {
+  const toggleLayerVisibility = (layerId: number) => {
     setLayers(layers.map(layer => 
       layer.id === layerId 
         ? { ...layer, visible: !layer.visible }
