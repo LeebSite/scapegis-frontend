@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContainer } from '../../components/organisms';
 import { RegisterForm, OAuthSection } from '../../components/molecules';
+import { SimpleRegisterCredentials } from '../../components/molecules/RegisterForm/RegisterForm';
 import { useAuthStore } from '../../stores/authStore';
-import { RegisterCredentials } from '../../types';
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -32,10 +32,18 @@ const Register: React.FC = () => {
     clearError();
   }, [clearError]);
 
-  const handleRegister = async (credentials: RegisterCredentials) => {
+  const handleRegister = async (credentials: SimpleRegisterCredentials) => {
     try {
-      await register(credentials);
-      // Navigation will be handled by the useEffect above after auto-login
+      // Convert simple credentials to full credentials for the API
+      const fullCredentials = {
+        email: credentials.email,
+        password: credentials.password,
+        confirmPassword: credentials.password,
+        fullName: credentials.email.split('@')[0], // Use email prefix as default name
+      };
+      await register(fullCredentials);
+      // Redirect to email verification page
+      navigate(`/email-verification?email=${encodeURIComponent(credentials.email)}`);
     } catch (error) {
       // Error is handled by the store
       console.error('Registration failed:', error);
@@ -53,6 +61,8 @@ const Register: React.FC = () => {
     }
   };
 
+
+
   return (
     <AuthContainer>
       <div className="space-y-6">
@@ -61,7 +71,7 @@ const Register: React.FC = () => {
           loading={isLoading}
           error={error}
         />
-        
+
         <OAuthSection
           onOAuthLogin={handleOAuthLogin}
           loading={isLoading}

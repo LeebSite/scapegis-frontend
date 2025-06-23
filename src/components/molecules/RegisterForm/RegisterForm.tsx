@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Input, Typography } from '../../atoms';
-import { RegisterCredentials } from '../../../types';
 import { cn } from '../../../utils/cn';
 
+// Simplified register credentials for minimalist design
+export interface SimpleRegisterCredentials {
+  email: string;
+  password: string;
+}
+
 interface RegisterFormProps {
-  onSubmit: (credentials: RegisterCredentials) => void;
+  onSubmit: (credentials: SimpleRegisterCredentials) => void;
   loading?: boolean;
   error?: string | null;
   className?: string;
@@ -17,23 +22,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   error,
   className,
 }) => {
-  const [formData, setFormData] = useState<RegisterCredentials>({
+  const [formData, setFormData] = useState<SimpleRegisterCredentials>({
     email: '',
     password: '',
-    confirmPassword: '',
-    fullName: '',
   });
 
-  const [errors, setErrors] = useState<Partial<RegisterCredentials>>({});
+  const [errors, setErrors] = useState<Partial<SimpleRegisterCredentials>>({});
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<RegisterCredentials> = {};
-
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = 'Full name is required';
-    } else if (formData.fullName.trim().length < 2) {
-      newErrors.fullName = 'Full name must be at least 2 characters';
-    }
+    const newErrors: Partial<SimpleRegisterCredentials> = {};
 
     if (!formData.email) {
       newErrors.email = 'Email is required';
@@ -45,14 +42,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 8) {
       newErrors.password = 'Password must be at least 8 characters';
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      newErrors.password = 'Password must contain at least one uppercase letter, one lowercase letter, and one number';
-    }
-
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
     }
 
     setErrors(newErrors);
@@ -66,7 +55,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     }
   };
 
-  const handleInputChange = (field: keyof RegisterCredentials) => (value: string) => {
+  const handleInputChange = (field: keyof SimpleRegisterCredentials) => (value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {
@@ -75,88 +64,46 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   };
 
   return (
-    <div className={cn('w-full max-w-md', className)}>
+    <div className={cn('w-full max-w-sm', className)}>
       <div className="text-center mb-8">
-        <Typography variant="h2" className="text-gray-900 mb-2">
+        <Typography variant="h2" className="text-gray-900 mb-2 text-2xl font-semibold">
           Create your account
         </Typography>
-        <Typography variant="body1" color="gray">
-          Join ScapeGIS and start building amazing maps
+        <Typography variant="body1" color="gray" className="text-sm">
+          Welcome to ScapeGIS
         </Typography>
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <Typography variant="body2" className="text-red-700">
+        <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-md">
+          <Typography variant="body2" className="text-red-700 text-sm">
             {error}
           </Typography>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <Input
-          label="Full name"
-          type="text"
-          placeholder="Enter your full name"
-          value={formData.fullName}
-          onChange={handleInputChange('fullName')}
-          error={errors.fullName}
-          required
-          disabled={loading}
-        />
-
-        <Input
-          label="Email address"
           type="email"
-          placeholder="Enter your email"
+          placeholder="Email address"
           value={formData.email}
           onChange={handleInputChange('email')}
           error={errors.email}
           required
           disabled={loading}
+          className="w-full"
         />
 
         <Input
-          label="Password"
           type="password"
-          placeholder="Create a strong password"
+          placeholder="Password (8+ characters)"
           value={formData.password}
           onChange={handleInputChange('password')}
           error={errors.password}
           required
           disabled={loading}
+          className="w-full"
         />
-
-        <Input
-          label="Confirm password"
-          type="password"
-          placeholder="Confirm your password"
-          value={formData.confirmPassword}
-          onChange={handleInputChange('confirmPassword')}
-          error={errors.confirmPassword}
-          required
-          disabled={loading}
-        />
-
-        <div className="flex items-start">
-          <input
-            type="checkbox"
-            required
-            className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded mt-1"
-          />
-          <div className="ml-3">
-            <Typography variant="body2" color="gray">
-              I agree to the{' '}
-              <Link to="/terms" className="text-green-600 hover:text-green-500">
-                Terms of Service
-              </Link>{' '}
-              and{' '}
-              <Link to="/privacy" className="text-green-600 hover:text-green-500">
-                Privacy Policy
-              </Link>
-            </Typography>
-          </div>
-        </div>
 
         <Button
           type="submit"
@@ -164,20 +111,27 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           size="lg"
           loading={loading}
           disabled={loading}
-          className="w-full"
+          className="w-full mt-6 bg-green-600 hover:bg-green-700 text-white py-3 rounded-md font-medium"
         >
-          {loading ? 'Creating account...' : 'Create account'}
+          {loading ? (
+            <div className="flex items-center justify-center">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              Creating account...
+            </div>
+          ) : (
+            'Create account'
+          )}
         </Button>
       </form>
 
       <div className="mt-6 text-center">
-        <Typography variant="body2" color="gray">
+        <Typography variant="body2" color="gray" className="text-sm">
           Already have an account?{' '}
           <Link
             to="/login"
-            className="text-green-600 hover:text-green-500 font-medium transition-colors"
+            className="text-green-600 hover:text-green-700 font-medium transition-colors"
           >
-            Sign in
+            Sign in here
           </Link>
         </Typography>
       </div>

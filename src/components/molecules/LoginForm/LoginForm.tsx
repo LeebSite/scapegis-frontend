@@ -59,59 +59,51 @@ const LoginForm: React.FC<LoginFormProps> = ({
   };
 
   return (
-    <div className={cn('w-full max-w-md', className)}>
+    <div className={cn('w-full max-w-sm', className)}>
       <div className="text-center mb-8">
-        <Typography variant="h2" className="text-gray-900 mb-2">
+        <Typography variant="h2" className="text-gray-900 mb-2 text-2xl font-semibold">
           Welcome back
         </Typography>
-        <Typography variant="body1" color="gray">
-          Sign in to your ScapeGIS account
+        <Typography variant="body1" color="gray" className="text-sm">
+          Sign in to your account
         </Typography>
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <Typography variant="body2" className="text-red-700">
+        <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-md">
+          <Typography variant="body2" className="text-red-700 text-sm">
             {error}
           </Typography>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <Input
-          label="Email address"
           type="email"
-          placeholder="Enter your email"
+          placeholder="Email address"
           value={formData.email}
           onChange={handleInputChange('email')}
           error={errors.email}
           required
           disabled={loading}
+          className="w-full"
         />
 
         <Input
-          label="Password"
           type="password"
-          placeholder="Enter your password"
+          placeholder="Password"
           value={formData.password}
           onChange={handleInputChange('password')}
           error={errors.password}
           required
           disabled={loading}
+          className="w-full"
         />
 
-        <div className="flex items-center justify-between">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-            />
-            <span className="ml-2 text-sm text-gray-600">Remember me</span>
-          </label>
-
+        <div className="flex items-center justify-between text-sm">
           <Link
             to="/forgot-password"
-            className="text-sm text-green-600 hover:text-green-500 transition-colors"
+            className="text-green-600 hover:text-green-700 transition-colors"
           >
             Forgot password?
           </Link>
@@ -123,20 +115,27 @@ const LoginForm: React.FC<LoginFormProps> = ({
           size="lg"
           loading={loading}
           disabled={loading}
-          className="w-full"
+          className="w-full mt-6 bg-green-600 hover:bg-green-700 text-white py-3 rounded-md font-medium"
         >
-          {loading ? 'Signing in...' : 'Sign in'}
+          {loading ? (
+            <div className="flex items-center justify-center">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              Signing in...
+            </div>
+          ) : (
+            'Sign in'
+          )}
         </Button>
       </form>
 
       <div className="mt-6 text-center">
-        <Typography variant="body2" color="gray">
+        <Typography variant="body2" color="gray" className="text-sm">
           Don't have an account?{' '}
           <Link
             to="/register"
-            className="text-green-600 hover:text-green-500 font-medium transition-colors"
+            className="text-green-600 hover:text-green-700 font-medium transition-colors"
           >
-            Sign up
+            Sign up here
           </Link>
         </Typography>
       </div>

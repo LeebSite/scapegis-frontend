@@ -15,18 +15,15 @@ const AuthContainer: React.FC<AuthContainerProps> = ({
   className,
 }) => {
   return (
-    <div className={cn('min-h-screen bg-gradient-to-br from-green-50 to-blue-50', className)}>
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-      
-      <div className="relative flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className={cn('min-h-screen bg-white flex flex-col justify-center', className)}>
+      <div className="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         {/* Logo and Brand */}
-        <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <Link to="/" className="flex justify-center">
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+          <Link to="/" className="flex justify-center mb-8">
             <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
                 <svg
-                  className="w-6 h-6 text-white"
+                  className="w-5 h-5 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -39,7 +36,7 @@ const AuthContainer: React.FC<AuthContainerProps> = ({
                   />
                 </svg>
               </div>
-              <Typography variant="h3" className="text-gray-900 font-bold">
+              <Typography variant="h3" className="text-gray-900 font-semibold text-xl">
                 ScapeGIS
               </Typography>
             </div>
@@ -47,36 +44,9 @@ const AuthContainer: React.FC<AuthContainerProps> = ({
         </div>
 
         {/* Auth Form Container */}
-        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-white py-8 px-4 shadow-xl rounded-2xl sm:px-10 border border-gray-100">
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+          <div className="px-6 py-8">
             {children}
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-8 text-center">
-          <Typography variant="body2" color="gray">
-            © 2024 ScapeGIS. All rights reserved.
-          </Typography>
-          <div className="mt-2 flex justify-center space-x-6">
-            <Link
-              to="/terms"
-              className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              Terms
-            </Link>
-            <Link
-              to="/privacy"
-              className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              Privacy
-            </Link>
-            <Link
-              to="/support"
-              className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              Support
-            </Link>
           </div>
         </div>
       </div>

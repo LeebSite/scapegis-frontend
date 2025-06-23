@@ -12,7 +12,7 @@ interface AuthState {
 
   // Actions
   login: (credentials: LoginCredentials) => Promise<void>;
-  register: (credentials: RegisterCredentials) => Promise<void>;
+  register: (credentials: RegisterCredentials) => Promise<{ email: string } | void>;
   logout: () => Promise<void>;
   oauthLogin: (provider: string) => Promise<void>;
   refreshToken: () => Promise<void>;
@@ -63,7 +63,7 @@ export const useAuthStore = create<AuthState>()(
         // Register action
         register: async (credentials: RegisterCredentials) => {
           set({ isLoading: true, error: null });
-          
+
           try {
             const response = await authApi.register(
               credentials.email,
@@ -71,11 +71,11 @@ export const useAuthStore = create<AuthState>()(
               credentials.fullName
             );
 
-            // Auto-login after successful registration
-            await get().login({
-              email: credentials.email,
-              password: credentials.password,
-            });
+            set({ isLoading: false });
+
+            // Don't auto-login, redirect to email verification instead
+            // The page component will handle the redirect
+            return { email: credentials.email };
           } catch (error: any) {
             const errorMessage = error.response?.data?.message || 'Registration failed. Please try again.';
             set({

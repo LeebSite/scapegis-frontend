@@ -53,6 +53,8 @@ const Login: React.FC = () => {
     }
   };
 
+
+
   return (
     <AuthContainer>
       <div className="space-y-6">
@@ -61,7 +63,7 @@ const Login: React.FC = () => {
           loading={isLoading}
           error={error}
         />
-        
+
         <OAuthSection
           onOAuthLogin={handleOAuthLogin}
           loading={isLoading}

@@ -4,3 +4,5 @@ export { default as ProjectEditor } from './ProjectEditor';
 export { default as IntegrationTest } from './IntegrationTest';
 export { default as Login } from './Login';
 export { default as Register } from './Register';
+export { default as EmailVerification } from './EmailVerification';
+export { default as ForgotPassword } from './ForgotPassword';
