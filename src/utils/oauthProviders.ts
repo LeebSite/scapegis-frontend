@@ -15,7 +15,3 @@ export const oauthProviders: OAuthProvider[] = [
     color: '#333333',
   },
 ];
-
-export const getOAuthProvider = (id: string): OAuthProvider | undefined => {
-  return oauthProviders.find(provider => provider.id === id);
-};
