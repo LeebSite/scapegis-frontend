@@ -6,7 +6,7 @@ import { cn } from '../../../utils/cn';
 interface OAuthSectionProps {
   onOAuthLogin: (providerId: string) => void;
   loading?: boolean;
-  loadingProvider?: string;
+  loadingProvider?: string | null;
   className?: string;
 }
 

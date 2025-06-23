@@ -21,7 +21,7 @@ const LandingPage: React.FC = () => {
     description: 'AI-powered geo analytics platform for software developer, logistic services, consultant, investor, and government',
     primaryAction: {
       label: 'Get Started Free',
-      onClick: () => navigate('/dashboard'),
+      onClick: () => navigate('/register'),
     },
     secondaryAction: {
       label: 'Watch Demo',

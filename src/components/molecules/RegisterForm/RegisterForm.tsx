@@ -7,7 +7,7 @@ import { cn } from '../../../utils/cn';
 interface RegisterFormProps {
   onSubmit: (credentials: RegisterCredentials) => void;
   loading?: boolean;
-  error?: string;
+  error?: string | null;
   className?: string;
 }
 

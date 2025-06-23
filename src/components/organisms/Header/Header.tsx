@@ -43,10 +43,10 @@ const Header: React.FC<HeaderProps> = ({
 
           {/* CTA Button */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="outline" size="sm" onClick={() => navigate('/dashboard')}>
+            <Button variant="outline" size="sm" onClick={() => navigate('/login')}>
               Sign In
             </Button>
-            <Button variant="primary" size="sm" onClick={() => navigate('/dashboard')}>
+            <Button variant="primary" size="sm" onClick={() => navigate('/register')}>
               Get Started
             </Button>
           </div>
@@ -97,10 +97,10 @@ const Header: React.FC<HeaderProps> = ({
                 />
               ))}
               <div className="pt-4 space-y-2">
-                <Button variant="outline" size="sm" className="w-full" onClick={() => navigate('/dashboard')}>
+                <Button variant="outline" size="sm" className="w-full" onClick={() => navigate('/login')}>
                   Sign In
                 </Button>
-                <Button variant="primary" size="sm" className="w-full" onClick={() => navigate('/dashboard')}>
+                <Button variant="primary" size="sm" className="w-full" onClick={() => navigate('/register')}>
                   Get Started
                 </Button>
               </div>
