@@ -4,3 +4,7 @@ export { default as SidebarItem } from './SidebarItem';
 export { default as ProjectCard } from './ProjectCard';
 export { default as MobileTopBar } from './MobileTopBar';
 export { default as LayerPanel } from './LayerPanel';
+export { default as LoginForm } from './LoginForm';
+export { default as RegisterForm } from './RegisterForm';
+export { default as OAuthSection } from './OAuthSection';
+export { default as ProtectedRoute } from './ProtectedRoute';

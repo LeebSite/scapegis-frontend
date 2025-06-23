@@ -61,3 +61,50 @@ export interface FeaturesSectionProps {
   features: FeatureCardProps[];
   className?: string;
 }
+
+// User and Auth types
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  workspace?: string;
+}
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterCredentials {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  fullName: string;
+}
+
+export interface AuthResponse {
+  access_token: string;
+  refresh_token: string;
+  user: User;
+}
+
+export interface OAuthProvider {
+  id: string;
+  name: string;
+  icon: React.ComponentType<any>;
+  color: string;
+}
+
+// Form Input types
+export interface InputProps {
+  label?: string;
+  placeholder?: string;
+  type?: 'text' | 'email' | 'password' | 'number';
+  value?: string;
+  onChange?: (value: string) => void;
+  error?: string;
+  disabled?: boolean;
+  required?: boolean;
+  className?: string;
+}

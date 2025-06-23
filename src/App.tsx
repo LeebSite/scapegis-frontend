@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { LandingPage, Dashboard, ProjectEditor, IntegrationTest } from './pages';
+import { LandingPage, Dashboard, ProjectEditor, IntegrationTest, Login, Register } from './pages';
+import { ProtectedRoute } from './components/molecules';
 import DevPanel from './components/molecules/DevPanel';
 import './App.css';
 
