@@ -9,9 +9,30 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Public routes */}
         <Route path="/" element={<LandingPage />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/project/:projectId" element={<ProjectEditor />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
+        {/* Protected routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/project/:projectId"
+          element={
+            <ProtectedRoute>
+              <ProjectEditor />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Development/Test routes */}
         <Route path="/test" element={<IntegrationTest />} />
       </Routes>
 
