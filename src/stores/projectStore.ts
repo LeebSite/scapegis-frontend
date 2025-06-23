@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { projectsApi, layersApi } from '../services/api';
 
 export interface Layer {
   id: string;
@@ -53,7 +54,7 @@ interface ProjectState {
   updateMapView: (center: [number, number], zoom: number) => void;
 }
 
-const generateId = () => Math.random().toString(36).substr(2, 9);
+const generateId = () => Math.random().toString(36).substring(2, 11);
 
 const createDefaultProject = (name: string = 'Untitled Project'): Project => ({
   id: generateId(),
@@ -121,46 +122,74 @@ export const useProjectStore = create<ProjectState>()(
         if (!currentProject) return;
 
         set({ isSaving: true });
-        
+
         try {
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          // In real app, this would save to backend
-          console.log('Project saved:', currentProject);
-          
+          const response = await projectsApi.update(currentProject.id, {
+            id: currentProject.id,
+            name: currentProject.name,
+            description: currentProject.description,
+            settings: {
+              layers: currentProject.layers,
+              mapCenter: currentProject.mapCenter,
+              mapZoom: currentProject.mapZoom,
+              bounds: currentProject.bounds
+            }
+          });
+
+          console.log('Project saved:', response.data);
           set({ isSaving: false });
         } catch (error) {
           console.error('Failed to save project:', error);
           set({ isSaving: false });
+          throw error;
         }
       },
 
       loadProject: async (projectId) => {
         set({ isLoading: true });
-        
+
         try {
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
-          // In real app, this would fetch from backend
-          const { projects } = get();
-          const project = projects.find(p => p.id === projectId);
-          
-          if (project) {
-            set({ currentProject: project, isLoading: false });
-          } else {
-            // Create new project if not found
-            const newProject = createDefaultProject();
-            set({ 
-              currentProject: newProject, 
-              projects: [...projects, newProject],
-              isLoading: false 
-            });
-          }
+          const response = await projectsApi.getById(projectId);
+          const projectData = response.data.data;
+
+          // Convert API response to internal format
+          const project: Project = {
+            id: projectData.id,
+            name: projectData.name,
+            description: projectData.description || '',
+            createdAt: projectData.created_at,
+            updatedAt: projectData.updated_at,
+            layers: [], // Will be loaded separately
+            mapCenter: projectData.settings?.mapCenter || [0, 0],
+            mapZoom: projectData.zoom_level || 2,
+            bounds: projectData.bounds
+          };
+
+          set({ currentProject: project, isLoading: false });
+
+          // Load layers for this project
+          const layersResponse = await layersApi.getByProject(projectId);
+          const layers = layersResponse.data.data.map(layer => ({
+            id: layer.id,
+            name: layer.name,
+            type: layer.layer_type as 'base' | 'vector' | 'raster' | 'point',
+            visible: layer.is_visible,
+            opacity: layer.opacity,
+            source: layer.data_source,
+            style: layer.style_config
+          }));
+
+          set(state => ({
+            currentProject: state.currentProject ? {
+              ...state.currentProject,
+              layers
+            } : null
+          }));
+
         } catch (error) {
           console.error('Failed to load project:', error);
           set({ isLoading: false });
+          throw error;
         }
       },
 

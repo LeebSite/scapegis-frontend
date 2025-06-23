@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography } from '../../atoms';
+import { Typography, ApiStatus } from '../../atoms';
 import { cn } from '../../../utils/cn';
 
 interface DashboardHeaderProps {
@@ -92,6 +92,22 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
+
+            {/* Integration Test Link */}
+            <a
+              href="/test"
+              className="flex items-center space-x-2 text-sm text-blue-600 hover:text-blue-700 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Test Integration</span>
+            </a>
+
+            {/* API Status */}
+            <div className="border-l border-gray-200 pl-3">
+              <ApiStatus />
+            </div>
           </div>
 
           {/* Mobile Action Buttons */}
