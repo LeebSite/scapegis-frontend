@@ -89,16 +89,21 @@ export const useAuthStore = create<AuthState>()(
         // Logout action
         logout: async () => {
           set({ isLoading: true });
-          
+
           try {
-            await authApi.logout();
+            // Call logout API if token exists and it's not a mock token
+            const token = localStorage.getItem('access_token');
+            if (token && !token.startsWith('mock_token_')) {
+              await authApi.logout();
+            }
           } catch (error) {
             console.error('Logout error:', error);
           } finally {
             // Clear tokens and state regardless of API call result
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
-            
+            localStorage.removeItem('user_info'); // Clear mock user info
+
             set({
               user: null,
               isAuthenticated: false,
@@ -162,8 +167,23 @@ export const useAuthStore = create<AuthState>()(
           }
 
           set({ isLoading: true });
-          
+
           try {
+            // Check if it's a mock token (for OAuth testing without database)
+            if (token.startsWith('mock_token_')) {
+              const userInfo = localStorage.getItem('user_info');
+              if (userInfo) {
+                const user = JSON.parse(userInfo);
+                set({
+                  user,
+                  isAuthenticated: true,
+                  isLoading: false,
+                });
+                return;
+              }
+            }
+
+            // Try to get profile from backend
             const response = await authApi.getProfile();
             const user = response.data.data;
 

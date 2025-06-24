@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { LandingPage, Dashboard, ProjectEditor, IntegrationTest, Login, Register, EmailVerification, ForgotPassword } from './pages';
+import { LandingPage, Dashboard, ProjectEditor, IntegrationTest, Login, Register, EmailVerification, ForgotPassword, AuthCallback } from './pages';
 import { ProtectedRoute } from './components/molecules';
 import DevPanel from './components/molecules/DevPanel';
 
@@ -14,6 +14,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/email-verification" element={<EmailVerification />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
 
         {/* Protected routes */}
         <Route
