@@ -11,77 +11,53 @@ const AuthCallback: React.FC = () => {
   const [status, setStatus] = useState<'processing' | 'success' | 'error'>('processing');
   const [message, setMessage] = useState('Processing authentication...');
 
-  const { login, clearError } = useAuthStore();
+  const { clearError } = useAuthStore();
 
   useEffect(() => {
     const processCallback = async () => {
       try {
-        // Clear any previous errors
         clearError();
-
-        // Get parameters from URL
-        const success = searchParams.get('success');
-        const provider = searchParams.get('provider');
-        const message = searchParams.get('message');
-        const token = searchParams.get('token');
+        // Ambil semua parameter yang mungkin dikirim backend
+        const accessToken = searchParams.get('access_token');
+        const refreshToken = searchParams.get('refresh_token');
+        const userId = searchParams.get('user_id');
+        const email = searchParams.get('email');
+        const name = searchParams.get('name');
+        const avatarUrl = searchParams.get('avatar_url');
         const error = searchParams.get('error');
-        const code = searchParams.get('code');
-
+        // Jika error
         if (error) {
           setStatus('error');
           setMessage(`Authentication failed: ${error}`);
+          setTimeout(() => navigate('/login', { replace: true }), 2000);
           return;
         }
-
-        // Handle success from backend (new format)
-        if (success === 'true') {
-          setStatus('success');
-          setMessage(`${provider} authentication successful! Redirecting to dashboard...`);
-
-          // For now, we'll create a mock token since backend doesn't provide real JWT yet
-          const mockToken = `mock_token_${provider}_${Date.now()}`;
-          localStorage.setItem('access_token', mockToken);
-
-          // Also store user info (mock data for now)
-          const mockUser = {
-            id: `user_${Date.now()}`,
-            email: `user@${provider}.com`,
-            name: `${provider} User`,
-            provider: provider
+        // Jika ada access_token, simpan semua data user
+        if (accessToken) {
+          localStorage.setItem('access_token', accessToken);
+          if (refreshToken) localStorage.setItem('refresh_token', refreshToken);
+          const userData = {
+            id: userId || '',
+            email: email ? decodeURIComponent(email) : '',
+            name: name ? decodeURIComponent(name) : '',
+            avatar_url: avatarUrl ? decodeURIComponent(avatarUrl) : '',
           };
-          localStorage.setItem('user_info', JSON.stringify(mockUser));
-
-          setTimeout(() => {
-            navigate('/dashboard', { replace: true });
-          }, 2000);
-          return;
-        }
-
-        if (token) {
-          // If we have a token, store it and redirect
-          localStorage.setItem('access_token', token);
-
+          localStorage.setItem('user_data', JSON.stringify(userData));
           setStatus('success');
           setMessage('Authentication successful! Redirecting...');
-
-          setTimeout(() => {
-            navigate('/dashboard', { replace: true });
-          }, 2000);
-        } else if (code) {
-          // If we have a code, we need to exchange it for tokens
-          setStatus('error');
-          setMessage('OAuth code received but token exchange not implemented');
-        } else if (!success) {
-          setStatus('error');
-          setMessage('No authentication data received');
+          setTimeout(() => navigate('/dashboard', { replace: true }), 1500);
+          return;
         }
+        // Jika tidak ada token, redirect ke login
+        setStatus('error');
+        setMessage('No authentication token received. Redirecting to login...');
+        setTimeout(() => navigate('/login', { replace: true }), 2000);
       } catch (error) {
-        console.error('Auth callback error:', error);
         setStatus('error');
         setMessage('An unexpected error occurred during authentication');
+        setTimeout(() => navigate('/login', { replace: true }), 2000);
       }
     };
-
     processCallback();
   }, [searchParams, navigate, clearError]);
 

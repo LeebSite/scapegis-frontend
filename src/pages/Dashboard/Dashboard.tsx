@@ -30,12 +30,17 @@ const Dashboard: React.FC = () => {
   // Auth store
   const { handleOAuthCallback } = useAuthStore();
 
-  const user = {
-    name: 'Muhammad Ghalib Pradipa',
-    email: 'ghalib@scapegis.com',
-    workspace: 'Personal Workspace',
-    avatar: undefined, // You can add avatar URL here
-  };
+  // === Ambil user dari localStorage ===
+  const [user, setUser] = useState<any>(null);
+  useEffect(() => {
+    const accessToken = localStorage.getItem('access_token');
+    const userData = localStorage.getItem('user_data');
+    if (!accessToken || !userData) {
+      navigate('/login', { replace: true });
+      return;
+    }
+    setUser(JSON.parse(userData));
+  }, [navigate]);
 
   // Handle OAuth callback parameters
   useEffect(() => {
@@ -103,6 +108,8 @@ const Dashboard: React.FC = () => {
 
       // Hide success message after 5 seconds
       setTimeout(() => setShowOAuthSuccess(false), 5000);
+
+      setUser(userData);
     }
 
     // Check for OAuth error
@@ -198,9 +205,7 @@ const Dashboard: React.FC = () => {
               <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
-              <div>
-                <strong>Success!</strong> You have been logged in successfully with OAuth.
-              </div>
+              <span>Login successful! Welcome, {user?.name || user?.email || 'User'}.</span>
             </div>
           </div>
         </div>
