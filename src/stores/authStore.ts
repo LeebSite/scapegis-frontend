@@ -15,6 +15,7 @@ interface AuthState {
   register: (credentials: RegisterCredentials) => Promise<{ email: string } | void>;
   logout: () => Promise<void>;
   oauthLogin: (provider: string) => Promise<void>;
+  handleOAuthCallback: (provider: string, success: boolean) => Promise<void>;
   refreshToken: () => Promise<void>;
   clearError: () => void;
   checkAuth: () => Promise<void>;
@@ -102,7 +103,7 @@ export const useAuthStore = create<AuthState>()(
             // Clear tokens and state regardless of API call result
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
-            localStorage.removeItem('user_info'); // Clear mock user info
+            localStorage.removeItem('user_data'); // Clear user data
 
             set({
               user: null,
@@ -116,16 +117,88 @@ export const useAuthStore = create<AuthState>()(
         // OAuth login action
         oauthLogin: async (provider: string) => {
           set({ isLoading: true, error: null });
-          
+
           try {
             // In a real implementation, this would redirect to OAuth provider
             // For now, we'll simulate the OAuth flow
             const oauthUrl = `${process.env.REACT_APP_API_URL}/api/v1/auth/oauth/${provider}`;
-            
+
             // Redirect to OAuth provider
             window.location.href = oauthUrl;
           } catch (error: any) {
             const errorMessage = error.response?.data?.message || `${provider} login failed. Please try again.`;
+            set({
+              isLoading: false,
+              error: errorMessage,
+            });
+            throw error;
+          }
+        },
+
+        // Handle OAuth callback
+        handleOAuthCallback: async (provider: string, success: boolean) => {
+          console.log(`🔄 AuthStore: Handling OAuth callback for ${provider}, success: ${success}`);
+          set({ isLoading: true, error: null });
+
+          try {
+            if (success) {
+              // Check if we have real JWT token and user data from localStorage
+              const token = localStorage.getItem('access_token');
+              const userInfo = localStorage.getItem('user_data'); // Changed from user_info to user_data
+
+              if (token && userInfo) {
+                const user = JSON.parse(userInfo);
+                console.log('💾 AuthStore: Using real JWT token and user data', {
+                  token: `${token.substring(0, 20)}...`,
+                  user
+                });
+
+                // Verify token with backend by getting user profile
+                try {
+                  const response = await authApi.getProfile();
+                  const backendUser = response.data.data;
+                  console.log('✅ AuthStore: Token verified with backend', backendUser);
+
+                  // Update state with backend user data
+                  set({
+                    user: backendUser,
+                    isAuthenticated: true,
+                    isLoading: false,
+                    error: null,
+                  });
+
+                  // Update stored user data with backend data
+                  localStorage.setItem('user_data', JSON.stringify(backendUser));
+
+                } catch (verifyError) {
+                  console.log('⚠️ AuthStore: Token verification failed, using stored data');
+                  // Fallback to stored user data if backend verification fails
+                  set({
+                    user,
+                    isAuthenticated: true,
+                    isLoading: false,
+                    error: null,
+                  });
+                }
+
+                console.log('✅ AuthStore: Authentication state updated with real JWT');
+              } else {
+                console.log('❌ AuthStore: No JWT token or user data found');
+                set({
+                  isLoading: false,
+                  error: `${provider} authentication failed - no token received`,
+                });
+              }
+            } else {
+              console.log('❌ AuthStore: OAuth callback failed');
+              set({
+                isLoading: false,
+                error: `${provider} authentication failed`,
+              });
+            }
+          } catch (error: any) {
+            console.error('❌ AuthStore: Error in handleOAuthCallback:', error);
+            const errorMessage = error.response?.data?.message || `${provider} authentication failed. Please try again.`;
             set({
               isLoading: false,
               error: errorMessage,
@@ -160,9 +233,13 @@ export const useAuthStore = create<AuthState>()(
 
         // Check authentication status
         checkAuth: async () => {
+          console.log('🔍 AuthStore: Checking authentication status');
           const token = localStorage.getItem('access_token');
+          console.log('🔍 AuthStore: Token found:', token ? `${token.substring(0, 20)}...` : 'null');
+
           if (!token) {
-            set({ isAuthenticated: false, user: null });
+            console.log('🔍 AuthStore: No token found, setting unauthenticated');
+            set({ isAuthenticated: false, user: null, isLoading: false });
             return;
           }
 
@@ -171,15 +248,38 @@ export const useAuthStore = create<AuthState>()(
           try {
             // Check if it's a mock token (for OAuth testing without database)
             if (token.startsWith('mock_token_')) {
-              const userInfo = localStorage.getItem('user_info');
+              console.log('🔍 AuthStore: Mock token detected, checking user info');
+              const userInfo = localStorage.getItem('user_data');
+              console.log('🔍 AuthStore: User info found:', userInfo ? 'yes' : 'no');
+
               if (userInfo) {
                 const user = JSON.parse(userInfo);
+                console.log('✅ AuthStore: Mock authentication successful', user);
                 set({
                   user,
                   isAuthenticated: true,
                   isLoading: false,
                 });
                 return;
+              } else {
+                console.log('❌ AuthStore: Mock token found but no user info');
+              }
+            } else {
+              // Handle real JWT token
+              console.log('🔍 AuthStore: Real JWT token detected');
+              const userInfo = localStorage.getItem('user_data');
+
+              if (userInfo) {
+                const user = JSON.parse(userInfo);
+                console.log('✅ AuthStore: Real JWT authentication with stored user info', user);
+                set({
+                  user,
+                  isAuthenticated: true,
+                  isLoading: false,
+                });
+                return;
+              } else {
+                console.log('🔍 AuthStore: Real JWT found but no stored user info, trying backend');
               }
             }
 

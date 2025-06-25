@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { LandingPage, Dashboard, ProjectEditor, IntegrationTest, Login, Register, EmailVerification, ForgotPassword, AuthCallback } from './pages';
+import OAuthTest from './pages/OAuthTest';
 import { ProtectedRoute } from './components/molecules';
 import DevPanel from './components/molecules/DevPanel';
 
@@ -36,6 +37,7 @@ function App() {
 
         {/* Development/Test routes */}
         <Route path="/test" element={<IntegrationTest />} />
+        <Route path="/oauth-test" element={<OAuthTest />} />
       </Routes>
 
       {/* Development Panel - only shows in development */}

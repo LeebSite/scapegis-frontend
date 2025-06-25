@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 OAuth Callback Test</h1>
+        <div id="status"></div>
+        <div id="data"></div>
+        <div id="localStorage"></div>
+        
+        <h3>Actions:</h3>
+        <button onclick="testOAuth()">Test OAuth Flow</button>
+        <button onclick="clearStorage()">Clear Storage</button>
+        <button onclick="checkStorage()">Check Storage</button>
+        <button onclick="redirectToDashboard()">Go to Dashboard</button>
+    </div>
+
+    <script>
+        // Parse URL parameters
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                oauth_success: params.get('oauth_success'),
+                provider: params.get('provider'),
+                access_token: params.get('access_token'),
+                refresh_token: params.get('refresh_token'),
+                user_id: params.get('user_id'),
+                email: params.get('email'),
+                name: params.get('name'),
+                avatar_url: params.get('avatar_url')
+            };
+        }
+
+        // Display status
+        function displayStatus() {
+            const params = getUrlParams();
+            const statusDiv = document.getElementById('status');
+            const dataDiv = document.getElementById('data');
+            
+            if (params.oauth_success === 'true') {
+                statusDiv.innerHTML = '<div class="success">✅ OAuth Success!</div>';
+                
+                // Store tokens
+                if (params.access_token) {
+                    localStorage.setItem('access_token', params.access_token);
+                }
+                if (params.refresh_token) {
+                    localStorage.setItem('refresh_token', params.refresh_token);
+                }
+                
+                // Store user data
+                const userData = {
+                    id: params.user_id,
+                    email: decodeURIComponent(params.email || ''),
+                    name: decodeURIComponent(params.name || ''),
+                    provider: params.provider,
+                    avatar_url: params.avatar_url ? decodeURIComponent(params.avatar_url) : null
+                };
+                
+                localStorage.setItem('user_data', JSON.stringify(userData));
+                
+                dataDiv.innerHTML = `
+                    <div class="info">
+                        <h4>OAuth Data Received:</h4>
+                        <pre>${JSON.stringify(params, null, 2)}</pre>
+                    </div>
+                `;
+                
+                // Auto redirect after 3 seconds
+                setTimeout(() => {
+                    redirectToDashboard();
+                }, 3000);
+                
+            } else if (params.oauth_success === 'false') {
+                statusDiv.innerHTML = '<div class="error">❌ OAuth Failed!</div>';
+            } else {
+                statusDiv.innerHTML = '<div class="info">ℹ️ No OAuth parameters detected</div>';
+            }
+        }
+
+        // Check localStorage
+        function checkStorage() {
+            const token = localStorage.getItem('access_token');
+            const userData = localStorage.getItem('user_data');
+            const refreshToken = localStorage.getItem('refresh_token');
+
+            document.getElementById('localStorage').innerHTML = `
+                <div class="container">
+                    <h4>📦 localStorage Contents:</h4>
+                    <p><strong>Access Token:</strong> ${token ? token.substring(0, 50) + '...' : 'null'}</p>
+                    <p><strong>Refresh Token:</strong> ${refreshToken ? refreshToken.substring(0, 50) + '...' : 'null'}</p>
+                    <p><strong>User Data:</strong></p>
+                    <pre>${userData || 'null'}</pre>
+                </div>
+            `;
+        }
+
+        // Clear storage
+        function clearStorage() {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('user_data');
+            alert('✅ Storage cleared!');
+            checkStorage();
+        }
+
+        // Test OAuth
+        function testOAuth() {
+            window.location.href = 'http://localhost:8001/api/v1/auth/oauth/google';
+        }
+
+        // Redirect to dashboard
+        function redirectToDashboard() {
+            // Clean URL first
+            window.history.replaceState({}, document.title, window.location.pathname);
+            
+            // Try different dashboard URLs
+            const dashboardUrls = [
+                'http://localhost:3001/dashboard',
+                'http://localhost:3000/dashboard',
+                '/dashboard'
+            ];
+            
+            // Try first URL
+            window.location.href = dashboardUrls[0];
+        }
+
+        // Initialize on page load
+        window.onload = function() {
+            displayStatus();
+            checkStorage();
+        };
+    </script>
+</body>
+</html>

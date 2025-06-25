@@ -11,10 +11,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated, isLoading, checkAuth } = useAuthStore();
 
   useEffect(() => {
+    console.log('🛡️ ProtectedRoute: Checking authentication', { isAuthenticated, isLoading, pathname: location.pathname });
     checkAuth();
   }, [checkAuth]);
 
+  console.log('🛡️ ProtectedRoute: Current state', { isAuthenticated, isLoading, pathname: location.pathname });
+
   if (isLoading) {
+    console.log('🛡️ ProtectedRoute: Showing loading screen');
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -26,10 +30,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
+    console.log('🛡️ ProtectedRoute: User not authenticated, redirecting to login');
     // Redirect to login page with return url
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  console.log('🛡️ ProtectedRoute: User authenticated, rendering children');
   return <>{children}</>;
 };
 
