@@ -27,92 +27,41 @@ const Dashboard: React.FC = () => {
   // Project store
   const { createNewProject } = useProjectStore();
 
-  // Auth store
-  const { handleOAuthCallback } = useAuthStore();
+  // Auth store - use proper auth state management
+  const { user, isAuthenticated, checkAuth } = useAuthStore();
 
-  // === Ambil user dari localStorage ===
-  const [user, setUser] = useState<any>(null);
+  // Check authentication on component mount
   useEffect(() => {
-    const accessToken = localStorage.getItem('access_token');
-    const userData = localStorage.getItem('user_data');
-    if (!accessToken || !userData) {
-      navigate('/login', { replace: true });
-      return;
-    }
-    setUser(JSON.parse(userData));
-  }, [navigate]);
+    checkAuth();
+  }, [checkAuth]);
 
-  // Handle OAuth callback parameters
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated && user === null) {
+      navigate('/login', { replace: true });
+    }
+  }, [isAuthenticated, user, navigate]);
+
+  // Show success notification if user just logged in via OAuth
   useEffect(() => {
     const oauthSuccess = searchParams.get('oauth_success');
     const provider = searchParams.get('provider');
-    const message = searchParams.get('message');
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
-    const userId = searchParams.get('user_id');
-    const email = searchParams.get('email');
-    const name = searchParams.get('name');
-    const avatarUrl = searchParams.get('avatar_url');
 
-    console.log('🔍 Dashboard OAuth Check:', {
-      oauthSuccess,
-      provider,
-      message,
-      accessToken: accessToken ? `${accessToken.substring(0, 20)}...` : null,
-      refreshToken: refreshToken ? `${refreshToken.substring(0, 20)}...` : null,
-      userId,
-      email,
-      name,
-      avatarUrl
-    });
-
-    if (oauthSuccess === 'true' && provider && accessToken) {
-      console.log(`🚀 Processing OAuth callback for ${provider} with real JWT token`);
-
-      // Show success notification
-      setShowOAuthSuccess(true);
+    if (oauthSuccess === 'true' && provider && user) {
       console.log(`✅ Login successful with ${provider}!`);
-
-      // Store real JWT tokens and user data from backend
-      localStorage.setItem('access_token', accessToken);
-      if (refreshToken) {
-        localStorage.setItem('refresh_token', refreshToken);
-      }
-
-      // Create user object from URL parameters
-      const userData = {
-        id: userId || `user_${Date.now()}`,
-        email: decodeURIComponent(email || `user@${provider}.com`),
-        name: decodeURIComponent(name || `${provider} User`),
-        provider: provider,
-        avatar_url: avatarUrl ? decodeURIComponent(avatarUrl) : undefined
-      };
-
-      localStorage.setItem('user_data', JSON.stringify(userData));
-      console.log('💾 Stored real authentication data:', userData);
-
-      // Handle OAuth callback through auth store with real data
-      handleOAuthCallback(provider, true)
-        .then(() => {
-          console.log('✅ OAuth callback handled successfully with real JWT');
-        })
-        .catch((error) => {
-          console.error('❌ OAuth callback handling failed:', error);
-        });
-
-      // Clean URL parameters after a short delay to ensure processing is complete
-      setTimeout(() => {
-        window.history.replaceState({}, document.title, '/dashboard');
-        console.log('🧹 URL parameters cleaned');
-      }, 100);
+      setShowOAuthSuccess(true);
 
       // Hide success message after 5 seconds
       setTimeout(() => setShowOAuthSuccess(false), 5000);
 
-      setUser(userData);
+      // Clean up URL parameters
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
     }
+  }, [searchParams, user]);
 
-    // Check for OAuth error
+  // Handle OAuth error parameters
+  useEffect(() => {
     const oauthError = searchParams.get('oauth_error');
     const errorProvider = searchParams.get('provider');
     const errorMessage = searchParams.get('message');
@@ -130,7 +79,7 @@ const Dashboard: React.FC = () => {
       // Hide error message after 8 seconds
       setTimeout(() => setShowOAuthError(false), 8000);
     }
-  }, [searchParams, handleOAuthCallback]);
+  }, [searchParams]);
 
   // Load recent projects on mount
   useEffect(() => {
@@ -191,11 +140,19 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  // Convert user to dashboard template format
+  const dashboardUser = user ? {
+    name: user.name || user.email || 'User',
+    email: user.email || '',
+    avatar: user.avatar,
+    workspace: user.workspace || 'Personal Workspace'
+  } : undefined;
+
   return (
     <DashboardTemplate
       title="Recents"
       subtitle="Your recently accessed projects and maps"
-      user={user}
+      user={dashboardUser}
     >
       {/* OAuth Success Notification */}
       {showOAuthSuccess && (

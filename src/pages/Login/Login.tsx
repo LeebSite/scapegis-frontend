@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { AuthContainer } from '../../components/organisms';
 import { LoginForm, OAuthSection } from '../../components/molecules';
 import { useAuthStore } from '../../stores/authStore';
 import { LoginCredentials } from '../../types';
@@ -56,21 +55,29 @@ const Login: React.FC = () => {
 
 
   return (
-    <AuthContainer>
-      <div className="space-y-6">
-        <LoginForm
-          onSubmit={handleLogin}
-          loading={isLoading}
-          error={error}
-        />
+    <div className="min-h-screen bg-white flex flex-col justify-center">
+      <div className="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        {/* Auth Form Container - No Logo/Title as per user preference */}
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+          <div className="px-6 py-8">
+            <div className="space-y-6">
+              <LoginForm
+                onSubmit={handleLogin}
+                loading={isLoading}
+                error={error}
+              />
 
-        <OAuthSection
-          onOAuthLogin={handleOAuthLogin}
-          loading={isLoading}
-          loadingProvider={oauthLoading}
-        />
+              {/* Google OAuth Button at the bottom as per user preference */}
+              <OAuthSection
+                onOAuthLogin={handleOAuthLogin}
+                loading={isLoading}
+                loadingProvider={oauthLoading}
+              />
+            </div>
+          </div>
+        </div>
       </div>
-    </AuthContainer>
+    </div>
   );
 };
 

@@ -19,11 +19,7 @@ interface DashboardSidebarProps {
 }
 
 const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
-  user = {
-    name: 'Muhammad Ghalib Pradipa',
-    email: 'ghalib@scapegis.com',
-    workspace: 'Personal Workspace'
-  },
+  user,
   activeItem = 'recents',
   onItemClick,
   isOpen = false,
@@ -31,6 +27,12 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   isMobile = false,
   className,
 }) => {
+  // Provide safe defaults for user data
+  const safeUser = user || {
+    name: 'Loading...',
+    email: 'loading@example.com',
+    workspace: 'Personal Workspace'
+  };
   const menuItems = [
     {
       id: 'new-project',
@@ -144,10 +146,10 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       {/* User Workspace */}
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center space-x-3">
-          <Avatar name={user.name} src={user.avatar} size="sm" />
+          <Avatar name={safeUser.name} src={safeUser.avatar} size="sm" />
           <div className="flex-1 min-w-0">
             <Typography variant="body2" color="gray" className="font-medium truncate">
-              {user.workspace}
+              {safeUser.workspace}
             </Typography>
           </div>
           <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -203,10 +205,10 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       {/* User Profile */}
       <div className="p-4 border-t border-gray-200">
         <div className="flex items-center space-x-3">
-          <Avatar name={user.name} src={user.avatar} size="sm" />
+          <Avatar name={safeUser.name} src={safeUser.avatar} size="sm" />
           <div className="flex-1 min-w-0">
             <Typography variant="body2" color="gray" className="font-medium truncate">
-              {user.name}
+              {safeUser.name}
             </Typography>
           </div>
           <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

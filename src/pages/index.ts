@@ -7,3 +7,4 @@ export { default as Register } from './Register';
 export { default as EmailVerification } from './EmailVerification';
 export { default as ForgotPassword } from './ForgotPassword';
 export { default as AuthCallback } from './AuthCallback';
+export { default as AuthError } from './AuthError';

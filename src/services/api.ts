@@ -30,13 +30,51 @@ apiClient.interceptors.request.use(
 // Response interceptor for error handling
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Handle unauthorized - redirect to login
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        // Try to refresh the token
+        const refreshToken = localStorage.getItem('refresh_token');
+
+        if (refreshToken) {
+          console.log('🔄 API: Attempting token refresh due to 401');
+
+          const response = await axios.post(`${API_BASE_URL}/api/v1/auth/refresh`, {
+            refresh_token: refreshToken
+          });
+
+          const { access_token } = response.data.data;
+          localStorage.setItem('access_token', access_token);
+
+          // Update the authorization header and retry the original request
+          originalRequest.headers.Authorization = `Bearer ${access_token}`;
+          console.log('✅ API: Token refreshed, retrying original request');
+
+          return apiClient(originalRequest);
+        }
+      } catch (refreshError) {
+        console.error('❌ API: Token refresh failed:', refreshError);
+      }
+
+      // If refresh fails or no refresh token, clear auth and redirect
+      console.log('🚪 API: Clearing auth data and redirecting to login');
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
-      window.location.href = '/login';
+      localStorage.removeItem('user_data');
+
+      // Only redirect if we're not already on an auth page
+      const currentPath = window.location.pathname;
+      if (!currentPath.startsWith('/login') &&
+          !currentPath.startsWith('/register') &&
+          !currentPath.startsWith('/auth/')) {
+        window.location.href = '/login';
+      }
     }
+
     return Promise.reject(error);
   }
 );

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { AuthContainer } from '../../components/organisms';
 import { RegisterForm, OAuthSection } from '../../components/molecules';
 import { SimpleRegisterCredentials } from '../../components/molecules/RegisterForm/RegisterForm';
 import { useAuthStore } from '../../stores/authStore';
@@ -64,21 +63,29 @@ const Register: React.FC = () => {
 
 
   return (
-    <AuthContainer>
-      <div className="space-y-6">
-        <RegisterForm
-          onSubmit={handleRegister}
-          loading={isLoading}
-          error={error}
-        />
+    <div className="min-h-screen bg-white flex flex-col justify-center">
+      <div className="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        {/* Auth Form Container - Consistent with login page */}
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+          <div className="px-6 py-8">
+            <div className="space-y-6">
+              <RegisterForm
+                onSubmit={handleRegister}
+                loading={isLoading}
+                error={error}
+              />
 
-        <OAuthSection
-          onOAuthLogin={handleOAuthLogin}
-          loading={isLoading}
-          loadingProvider={oauthLoading}
-        />
+              {/* Google OAuth Button at the bottom - consistent with login */}
+              <OAuthSection
+                onOAuthLogin={handleOAuthLogin}
+                loading={isLoading}
+                loadingProvider={oauthLoading}
+              />
+            </div>
+          </div>
+        </div>
       </div>
-    </AuthContainer>
+    </div>
   );
 };
 

@@ -66,7 +66,7 @@ export const useAuthStore = create<AuthState>()(
           set({ isLoading: true, error: null });
 
           try {
-            const response = await authApi.register(
+            await authApi.register(
               credentials.email,
               credentials.password,
               credentials.fullName
@@ -119,13 +119,20 @@ export const useAuthStore = create<AuthState>()(
           set({ isLoading: true, error: null });
 
           try {
-            // In a real implementation, this would redirect to OAuth provider
-            // For now, we'll simulate the OAuth flow
-            const oauthUrl = `${process.env.REACT_APP_API_URL}/api/v1/auth/oauth/${provider}`;
+            console.log(`🚀 AuthStore: Initiating OAuth login for ${provider}`);
 
-            // Redirect to OAuth provider
+            // Construct OAuth URL with proper callback
+            const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8001';
+
+            // The backend should handle the redirect back to frontend
+            const oauthUrl = `${apiUrl}/api/v1/auth/oauth/${provider}`;
+
+            console.log(`🔗 AuthStore: Redirecting to OAuth URL: ${oauthUrl}`);
+
+            // Redirect to OAuth provider via backend
             window.location.href = oauthUrl;
           } catch (error: any) {
+            console.error(`❌ AuthStore: OAuth login failed for ${provider}:`, error);
             const errorMessage = error.response?.data?.message || `${provider} login failed. Please try again.`;
             set({
               isLoading: false,
@@ -235,7 +242,9 @@ export const useAuthStore = create<AuthState>()(
         checkAuth: async () => {
           console.log('🔍 AuthStore: Checking authentication status');
           const token = localStorage.getItem('access_token');
+          const userInfo = localStorage.getItem('user_data');
           console.log('🔍 AuthStore: Token found:', token ? `${token.substring(0, 20)}...` : 'null');
+          console.log('🔍 AuthStore: User info found:', userInfo ? 'yes' : 'no');
 
           if (!token) {
             console.log('🔍 AuthStore: No token found, setting unauthenticated');
@@ -246,46 +255,41 @@ export const useAuthStore = create<AuthState>()(
           set({ isLoading: true });
 
           try {
-            // Check if it's a mock token (for OAuth testing without database)
-            if (token.startsWith('mock_token_')) {
-              console.log('🔍 AuthStore: Mock token detected, checking user info');
-              const userInfo = localStorage.getItem('user_data');
-              console.log('🔍 AuthStore: User info found:', userInfo ? 'yes' : 'no');
+            // If we have stored user info, use it first for faster loading
+            if (userInfo) {
+              const user = JSON.parse(userInfo);
+              console.log('✅ AuthStore: Using stored user info for quick auth', user);
+              set({
+                user,
+                isAuthenticated: true,
+                isLoading: false,
+              });
 
-              if (userInfo) {
-                const user = JSON.parse(userInfo);
-                console.log('✅ AuthStore: Mock authentication successful', user);
-                set({
-                  user,
-                  isAuthenticated: true,
-                  isLoading: false,
-                });
-                return;
-              } else {
-                console.log('❌ AuthStore: Mock token found but no user info');
-              }
-            } else {
-              // Handle real JWT token
-              console.log('🔍 AuthStore: Real JWT token detected');
-              const userInfo = localStorage.getItem('user_data');
+              // Optionally verify token in background (don't await)
+              authApi.getProfile()
+                .then(response => {
+                  const backendUser = response.data.data;
+                  console.log('🔄 AuthStore: Background token verification successful, updating user data');
 
-              if (userInfo) {
-                const user = JSON.parse(userInfo);
-                console.log('✅ AuthStore: Real JWT authentication with stored user info', user);
-                set({
-                  user,
-                  isAuthenticated: true,
-                  isLoading: false,
+                  // Update with fresh data from backend
+                  set({ user: backendUser });
+                  localStorage.setItem('user_data', JSON.stringify(backendUser));
+                })
+                .catch(error => {
+                  console.warn('⚠️ AuthStore: Background token verification failed:', error);
+                  // Don't logout here as user might be offline
                 });
-                return;
-              } else {
-                console.log('🔍 AuthStore: Real JWT found but no stored user info, trying backend');
-              }
+
+              return;
             }
 
-            // Try to get profile from backend
+            // No stored user info, must verify with backend
+            console.log('🔍 AuthStore: No stored user info, verifying token with backend');
             const response = await authApi.getProfile();
             const user = response.data.data;
+
+            console.log('✅ AuthStore: Token verified with backend', user);
+            localStorage.setItem('user_data', JSON.stringify(user));
 
             set({
               user,
@@ -293,12 +297,18 @@ export const useAuthStore = create<AuthState>()(
               isLoading: false,
             });
           } catch (error) {
+            console.warn('⚠️ AuthStore: Token verification failed, attempting refresh');
+
             // Token might be expired, try to refresh
             try {
               await get().refreshToken();
-              // Retry getting profile
+
+              // Retry getting profile after refresh
               const response = await authApi.getProfile();
               const user = response.data.data;
+
+              console.log('✅ AuthStore: Token refreshed and profile retrieved', user);
+              localStorage.setItem('user_data', JSON.stringify(user));
 
               set({
                 user,
@@ -306,6 +316,7 @@ export const useAuthStore = create<AuthState>()(
                 isLoading: false,
               });
             } catch (refreshError) {
+              console.error('❌ AuthStore: Token refresh failed, logging out:', refreshError);
               // Both token and refresh failed, logout
               get().logout();
             }
