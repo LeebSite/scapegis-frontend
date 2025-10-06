@@ -13,7 +13,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   useEffect(() => {
     console.log('🛡️ ProtectedRoute: Checking authentication', { isAuthenticated, isLoading, pathname: location.pathname });
     checkAuth();
-  }, [checkAuth]);
+  }, [checkAuth, isAuthenticated, isLoading, location.pathname]);
 
   console.log('🛡️ ProtectedRoute: Current state', { isAuthenticated, isLoading, pathname: location.pathname });
 

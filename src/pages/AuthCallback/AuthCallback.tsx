@@ -171,7 +171,7 @@ const AuthCallback: React.FC = () => {
     };
 
     processCallback();
-  }, [searchParams, navigate, clearError]);
+  }, [searchParams, navigate, clearError, checkAuth]);
 
   const getIcon = () => {
     switch (status) {

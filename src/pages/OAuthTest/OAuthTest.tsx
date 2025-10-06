@@ -14,7 +14,7 @@ const OAuthTest: React.FC = () => {
   useEffect(() => {
     addLog('🚀 OAuthTest component mounted');
     checkAuth();
-  }, []);
+  }, [checkAuth]);
 
   const testOAuthCallback = async () => {
     addLog('🧪 Testing OAuth callback...');
