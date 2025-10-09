@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Typography, Avatar, Badge } from '../../atoms';
 import { SidebarItem } from '../../molecules';
 import { cn } from '../../../utils/cn';
@@ -16,6 +16,7 @@ interface DashboardSidebarProps {
   onClose?: () => void;
   isMobile?: boolean;
   className?: string;
+  onLogout?: () => void;
 }
 
 const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
@@ -26,7 +27,13 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   onClose,
   isMobile = false,
   className,
+  onLogout,
 }) => {
+  const [isProfileDropdownOpen, setProfileDropdownOpen] = useState(false);
+
+  const toggleProfileDropdown = () => {
+    setProfileDropdownOpen(!isProfileDropdownOpen);
+  };
   // Provide safe defaults for user data
   const safeUser = user || {
     name: 'Loading...',
@@ -203,8 +210,16 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       </div>
 
       {/* User Profile */}
-      <div className="p-4 border-t border-gray-200">
-        <div className="flex items-center space-x-3">
+      <div className="relative p-4 border-t border-gray-200">
+        {isProfileDropdownOpen && (
+          <div className="absolute bottom-full mb-2 w-full left-0 bg-white rounded-md shadow-lg z-10">
+            <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Account settings</a>
+            <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Privacy Policy</a>
+            <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Terms of Service</a>
+            <button onClick={onLogout} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</button>
+          </div>
+        )}
+        <div className="flex items-center space-x-3 cursor-pointer" onClick={toggleProfileDropdown}>
           <Avatar name={safeUser.name} src={safeUser.avatar} size="sm" />
           <div className="flex-1 min-w-0">
             <Typography variant="body2" color="gray" className="font-medium truncate">

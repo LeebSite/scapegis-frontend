@@ -15,6 +15,7 @@ interface DashboardTemplateProps {
     workspace: string;
   };
   className?: string;
+  onLogout?: () => void;
 }
 
 const DashboardTemplate: React.FC<DashboardTemplateProps> = ({
@@ -24,6 +25,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({
   headerActions,
   user,
   className,
+  onLogout,
 }) => {
   const [activeItem, setActiveItem] = useState('recents');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -80,6 +82,7 @@ const DashboardTemplate: React.FC<DashboardTemplateProps> = ({
         isOpen={isSidebarOpen}
         onClose={closeSidebar}
         isMobile={isMobile}
+        onLogout={onLogout}
       />
 
       {/* Main Content */}

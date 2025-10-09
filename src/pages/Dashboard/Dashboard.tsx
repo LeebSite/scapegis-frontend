@@ -28,7 +28,7 @@ const Dashboard: React.FC = () => {
   const { createNewProject } = useProjectStore();
 
   // Auth store - use proper auth state management
-  const { user, isAuthenticated, checkAuth } = useAuthStore();
+  const { user, isAuthenticated, checkAuth, logout } = useAuthStore();
 
   // Check authentication on component mount
   useEffect(() => {
