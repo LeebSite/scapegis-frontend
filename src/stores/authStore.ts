@@ -95,7 +95,20 @@ export const useAuthStore = create<AuthState>()(
             // Call logout API if token exists and it's not a mock token
             const token = localStorage.getItem('access_token');
             if (token && !token.startsWith('mock_token_')) {
-              await authApi.logout();
+              const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8001';
+              const response = await fetch(`${apiUrl}/auth/logout`, {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json',
+                },
+              });
+
+              if (!response.ok) {
+                console.error('Logout API failed:', response.status, response.statusText);
+              } else {
+                console.log('Logout API successful');
+              }
             }
           } catch (error) {
             console.error('Logout error:', error);

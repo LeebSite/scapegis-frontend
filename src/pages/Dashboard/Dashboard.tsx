@@ -140,6 +140,19 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleLogout = async () => {
+    console.log('Logout button clicked');
+    try {
+      await logout();
+      console.log('Logout completed, navigating to login');
+      navigate('/login', { replace: true });
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Still navigate to login even if logout fails
+      navigate('/login', { replace: true });
+    }
+  };
+
   // Convert user to dashboard template format
   const dashboardUser = user ? {
     name: user.name || user.email || 'User',
@@ -153,6 +166,7 @@ const Dashboard: React.FC = () => {
       title="Recents"
       subtitle="Your recently accessed projects and maps"
       user={dashboardUser}
+      onLogout={handleLogout}
     >
       {/* OAuth Success Notification */}
       {showOAuthSuccess && (

@@ -211,14 +211,14 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
 
       {/* User Profile */}
       <div className="relative p-4 border-t border-gray-200">
-        {isProfileDropdownOpen && (
+          {isProfileDropdownOpen && (
           <div className="absolute bottom-full mb-2 w-full left-0 bg-white rounded-md shadow-lg z-10">
-            <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Account settings</a>
-            <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Privacy Policy</a>
-            <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Terms of Service</a>
+            <button type="button" className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Account settings</button>
+            <button type="button" className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Privacy Policy</button>
+            <button type="button" className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Terms of Service</button>
             <button onClick={onLogout} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</button>
           </div>
-        )}
+          )}
         <div className="flex items-center space-x-3 cursor-pointer" onClick={toggleProfileDropdown}>
           <Avatar name={safeUser.name} src={safeUser.avatar} size="sm" />
           <div className="flex-1 min-w-0">
